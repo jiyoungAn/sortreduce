@@ -55,19 +55,25 @@ int main(int argc, char** argv) {
 	read = getline(&buf, &len, fp);
 
 	printf( "Started!\n" ); fflush(stdout);
-	std::bitset<252> bits;
+	bool bits[252];
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 	while ((read = getline(&buf, &len, fp)) != -1) {
 		//encode
         for (int j = 0; j < 126; j++){
-            int n = 250 - j*2;
-            bits[n+1] = fl[acid[buf[j]]];
-            bits[n] = ll[acid[buf[j]]];
+            int n = j*2;
+            bits[n] = fl[acid[buf[j]]];
+            bits[n+1] = ll[acid[buf[j]]];
         }
-        auto sbits = bits.to_string();
 		char * tp = &buf[64];
 		for (int i=0; i<c; i++){
-			SortReduceTypes::uint128_t key(sbits.substr(i*2, 128));
+			uint64_t d[2] = {0};
+			int idx = 64; int addr = i*2;
+			while(idx-- > 0 ){
+				if(bits[addr]){ d[0] |= 1 << idx;}
+				if(bits[(addr+64)]){ d[1] |= 1 << idx;}
+				addr++;
+			}
+			SortReduceTypes::uint128_t key(d);
 			while ( !sr->Update(key, SortReduceTypes::Count(acid[*tp])) ) {
 			}
 			tp++;

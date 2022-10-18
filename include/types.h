@@ -138,28 +138,38 @@ namespace SortReduceTypes {
 	class uint128_t
 	{
 	private:
-		std::bitset<128> data;
+		uint64_t data[2] = {0};
 	public:
-		uint128_t(){data = 0;}
-		uint128_t(uint64_t d) { data = d;}
-		uint128_t(std::string str) { data = std::bitset<128>(str);}
-		uint128_t(std::bitset<128> d) { data = d;}
-		friend std::ostream& operator << (std::ostream &out, const uint128_t &d) { out << d.data; return out; }
+		uint128_t(){}
+		uint128_t(int d) {data[1] = d;}
+		uint128_t(uint64_t d[2]) { data[0] = d[0]; data[1] = d[1];}
+		friend std::ostream& operator << (std::ostream &out, const uint128_t &d) { 
+			// std::bitset<64> t0 = d.data[0];
+			// std::bitset<64> t1 = d.data[1];
+			// out << t0 << t1;
+			out << d.data[0] << " " << d.data[1]; return out; 
+			return out;
+		}
 
 		friend bool operator < (const uint128_t &d1, const uint128_t &d2) {
-			return d1.data.to_string() < d2.data.to_string();
+			if (d1.data[0] < d2.data[0]) return true;
+			else if (d1.data[0] > d2.data[0]) return false;
+			else return (d1.data[1] < d2.data[1]);
 		}
 
 		friend bool operator > (const uint128_t &d1, const uint128_t &d2) {
-			return d1.data.to_string() > d2.data.to_string();
+			if (d1.data[0] > d2.data[0]) return true;
+			else if (d1.data[0] < d2.data[0]) return false;
+			else return (d1.data[1] > d2.data[1]);
 		}
 
 		friend bool operator == (const uint128_t &d1, const uint128_t &d2) {
-			return d1.data == d2.data;
+			return (d1.data[0] == d2.data[0]) && (d1.data[1] == d2.data[1]);
 		}
 
 		uint128_t operator = (uint128_t other){
-			this->data = other.data;
+			this->data[0] = other.data[0];
+			this->data[1] = other.data[1];
 			return *this;
 		}
 	};
